@@ -297,6 +297,7 @@ class Sub(tk.Frame):
 
 def main():
     tsp = MGG.TSP()
+    tsp.c_circular(c.CITY_NUM)
     root = tk.Tk()
     app = App(root, tsp)
     app.mainloop()

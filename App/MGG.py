@@ -1,6 +1,7 @@
 import math
 import random
 import copy
+from Drawpdf import draw_tour
 
 import config as c
 
@@ -11,7 +12,6 @@ class TSP:
         self.city_pos = []  # stores x,y position of cities
         self.city_pairs = []  # list of pairs of cities
         self.dist_list = []  # stores distance b/w all the cities
-        self.c_circular(c.CITY_NUM)
 
     def c_circular(self, num):
         self.city_pos.clear()
@@ -310,13 +310,28 @@ class Tour:
 
 
 def main():
+    import datetime
+    print("--PROCESSING--")
+    print(datetime.datetime.today().time()) 
     tsp = TSP()
-    tsp = TSP()
-    tsp.c_rand(c.CITY_NUM)
+    # tsp.c_rand(c.CITY_NUM)
+    tsp.c_circular(c.CITY_NUM)
     tsp.c_dist_list()
+    # for circular cities
+    best_route = [i*2 for i in range(int(c.CITY_NUM/2))]
+    for s_i in range(int(c.CITY_NUM)-1, 0, -2):
+        best_route.append(s_i)
+    best_tour = Tour(tsp)
+    best_tour.gene=best_route
+    print("最適解:",best_tour.calc_fitness())
+    draw_tour(best_tour.gene, tsp.city_pos, "/mnt/c/Users/peace/Desktop/out/answer", text="fitness: "+str(best_tour.fitness))
+    print("--Wrote answer tour to start.pdf--")
 
     ga = GA(tsp)
     ga.init_s_list()
+    initial_tour = ga.s_list[0].get_best_tour()  
+    draw_tour(initial_tour.gene,tsp.city_pos, "/mnt/c/Users/peace/Desktop/out/start", text="fitness: "+str(initial_tour.fitness))
+    print("--Wrote initial tour to start.pdf--")
 
     while ga.generation <= c.GENERATION_COMBINE:
         ga.generation += 1
@@ -335,7 +350,12 @@ def main():
         if ga.generation % c.GENERATION_STEP == 0:
             ga.show_stats(ga.s_combined)
 
+    result_tour = ga.s_combined.get_best_tour()
+    draw_tour(result_tour.gene,tsp.city_pos, "/mnt/c/Users/peace/Desktop/out/result", text="fitness: "+str(initial_tour.fitness))
+    print("--Wrote result tour to result.pdf--")
     print("--finished--")
+    print(datetime.datetime.today().time()) 
+
 
 
 if __name__ == '__main__':
